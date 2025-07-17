@@ -1,1 +1,3 @@
 dev.env
+/venv/
+test_sdk_all.py

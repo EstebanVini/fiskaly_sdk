@@ -1,2 +1,18 @@
+# Dependencias principales del SDK
 requests>=2.25.1
 pydantic>=2.0.0
+
+# Para desarrollo y tests unitarios
+pytest>=7.0
+pytest-mock>=3.6.1
+python-dotenv
+# Para type checking (opcional, recomendado)
+mypy>=1.4.0
+# Para linting/código limpio (opcional)
+flake8>=6.0.0
+
+# Si usas logging enriquecido
+colorlog>=6.7.0
+
+# Documentación (opcional)
+markdown>=3.4.0
