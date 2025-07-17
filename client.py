@@ -26,16 +26,7 @@ from .api.software import SoftwareAPI
 class FiskalyClient:
     """
     Cliente principal para interactuar con la API de Fiskaly SIGN ES.
-
     Proporciona acceso a todos los recursos del API, maneja autenticación y configuración.
-
-    Ejemplo de uso:
-        client = FiskalyClient(
-            api_key="tu_api_key",
-            api_secret="tu_api_secret"
-        )
-        client.authenticate()
-        info = client.taxpayer.get()
     """
 
     def __init__(
@@ -44,15 +35,8 @@ class FiskalyClient:
         api_secret: str,
         base_url: str = "https://sign-api.fiskaly.com/api/v1",
         timeout: int = 30,
+        verify_ssl: bool = True
     ):
-        """
-        Inicializa el cliente Fiskaly.
-
-        :param api_key: API Key de tu cuenta Fiskaly.
-        :param api_secret: API Secret de tu cuenta Fiskaly.
-        :param base_url: URL base de la API SIGN ES (por defecto producción).
-        :param timeout: Timeout para peticiones HTTP (segundos).
-        """
         self.config = FiskalyConfig(
             api_key=api_key,
             api_secret=api_secret,
@@ -73,15 +57,11 @@ class FiskalyClient:
         self.invoice_xml = InvoiceXMLAPI(self)
         self.invoice_search = InvoiceSearchAPI(self)
         self.software = SoftwareAPI(self)
+        self.verify_ssl = verify_ssl
 
     def authenticate(self) -> str:
         """
         Realiza la autenticación y obtiene un token Bearer.
-
-        Este método debe ser llamado antes de acceder a cualquier recurso protegido.
-
-        :return: Token Bearer obtenido.
-        :raises FiskalyAuthError: Si falla la autenticación.
         """
         token = self.auth.retrieve_access_token()
         self._bearer_token = token
@@ -91,9 +71,6 @@ class FiskalyClient:
     def headers(self) -> Dict[str, str]:
         """
         Obtiene los headers HTTP requeridos para las peticiones autenticadas.
-
-        :return: Diccionario con headers HTTP.
-        :raises FiskalyAuthError: Si el token no ha sido inicializado.
         """
         if not self._bearer_token:
             raise FiskalyAuthError("El token Bearer no está presente. Llama a authenticate() primero.")
@@ -104,24 +81,25 @@ class FiskalyClient:
         }
 
     def request(self, method: str, endpoint: str, **kwargs) -> Any:
-        """
-        Realiza una petición HTTP autenticada a la API Fiskaly.
-
-        :param method: Método HTTP (GET, POST, PUT, PATCH, DELETE).
-        :param endpoint: Path relativo del endpoint (ej: '/taxpayer').
-        :param kwargs: Otros argumentos soportados por requests.request.
-        :return: Respuesta decodificada (dict para JSON, bytes para binarios).
-        :raises FiskalyApiError: Si la API responde con un error.
-        """
         url = f"{self.config.base_url}{endpoint}"
         headers = kwargs.pop("headers", {})
-        headers = {**self.headers, **headers}
+        # Para login: NO uses self.headers (que requiere Bearer)
+        if endpoint == "/auth":
+            # Solo content-type y accept
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                **headers
+            }
+        else:
+            headers = {**self.headers, **headers}
         try:
             resp = self.session.request(
                 method=method,
                 url=url,
                 headers=headers,
                 timeout=self.config.timeout,
+                verify=self.verify_ssl,
                 **kwargs
             )
         except requests.RequestException as e:
@@ -140,20 +118,9 @@ class FiskalyClient:
         else:
             return resp.content
 
+
     def set_bearer_token(self, token: str):
-        """
-        Permite setear manualmente el token Bearer.
-
-        Útil para flujos personalizados o restaurar sesiones.
-
-        :param token: Token Bearer válido.
-        """
         self._bearer_token = token
 
     def get_bearer_token(self) -> Optional[str]:
-        """
-        Obtiene el token Bearer actual.
-
-        :return: Token Bearer, o None si no ha sido autenticado.
-        """
         return self._bearer_token

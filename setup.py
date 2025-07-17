@@ -1,13 +1,15 @@
-# setup.py
-
 from setuptools import setup, find_packages
+import os
+
+# Path seguro para README
+readme_path = "README.md" if os.path.exists("README.md") else "docs/README.md"
 
 setup(
     name='fiskaly-sdk-sign-es',
     version='0.1.0',
     description='SDK oficial para la integración con la API Fiskaly SIGN ES',
-    author='Tu Nombre o Empresa',
-    author_email='tu-email@dominio.com',
+    author='Esteban Viniegra Pérez Olagaray',
+    author_email='esteban@eviniegra.software',
     url='https://github.com/tuusuario/fiskaly-sdk-sign-es',
     packages=find_packages(),
     install_requires=[
@@ -23,6 +25,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Development Status :: 3 - Alpha',
     ],
-    long_description=open("docs/README.md", encoding="utf-8").read(),
+    long_description=open(readme_path, encoding="utf-8").read(),
     long_description_content_type="text/markdown"
 )

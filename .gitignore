@@ -1,3 +1,8 @@
 dev.env
 /venv/
 test_sdk_all.py
+/fiskaly_sdk_sign_es.egg-info/
+/dist/
+__pycache__/
+/api/__pycache__/
+models/__pycache__/

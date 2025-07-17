@@ -30,7 +30,7 @@ class AuthAPI:
         :return: Token Bearer válido para ser usado en llamadas autenticadas.
         :raises FiskalyAuthError: Si la autenticación falla.
         """
-        # Prepara payload
+        # Prepara payload (puedes usar AuthRequest si quieres validación extra)
         payload = {
             "content": {
                 "api_key": self.client.config.api_key,
@@ -38,27 +38,18 @@ class AuthAPI:
             }
         }
         try:
-            response = self.client.session.post(
-                url=f"{self.client.config.base_url}/auth",
-                json=payload,
-                headers={
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                timeout=self.client.config.timeout
+            # Usa el método centralizado para facilitar los mocks y la trazabilidad
+            response = self.client.request(
+                method="POST",
+                endpoint="/auth",
+                json=payload
             )
         except Exception as e:
             raise FiskalyAuthError(f"Error de conexión al autenticar: {e}")
 
-        if response.status_code != 200:
-            try:
-                err = response.json()
-            except Exception:
-                err = response.text
-            raise FiskalyAuthError(f"Error autenticando: {err}")
-
         try:
-            auth_response = AuthResponse.parse_obj(response.json())
+            # Aquí podrías validar con Pydantic v2 (model_validate)
+            auth_response = AuthResponse.model_validate(response)
             bearer = auth_response.content.access_token.bearer
             self.client.set_bearer_token(bearer)
             return bearer

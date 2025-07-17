@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fiskaly-sdk-sign-es"
+version = "0.1.0"
+description = "SDK oficial para la integración con la API Fiskaly SIGN ES"
+readme = "README.md"
+authors = [
+    { name="Esteban Viniegra Pérez Olagaray", email="esteban@eviniegra.software" },
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 3 - Alpha",
+]
+
+dependencies = [
+    "requests>=2.25.1",
+    "pydantic>=2.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/tuusuario/fiskaly-sdk-sign-es"
+Documentation = "https://docs.fiskaly.com/es/sign"
+Source = "https://github.com/tuusuario/fiskaly-sdk-sign-es"
+
+# Opcional: para incluir ejemplos y tests como parte del paquete fuente
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fiskaly_sdk*"]
+
+# Opcional: para incluir archivos extra (README, LICENSE, etc.)
+[tool.setuptools]
+include-package-data = true
