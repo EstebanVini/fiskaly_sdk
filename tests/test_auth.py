@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
-from fiskaly_sdk.client import FiskalyClient
-from fiskaly_sdk.exceptions import FiskalyAuthError
+from fiskaly_sdk.client import FiskalyClient # type: ignore
+from fiskaly_sdk.exceptions import FiskalyAuthError # type: ignore
 
 @pytest.fixture
 def client():
