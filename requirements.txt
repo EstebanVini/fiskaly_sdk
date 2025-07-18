@@ -1,0 +1,18 @@
+# Dependencias principales del SDK
+requests
+pydantic
+
+# Para desarrollo y tests unitarios
+pytest
+pytest-mock
+python-dotenv
+# Para type checking (opcional, recomendado)
+mypy
+# Para linting/código limpio (opcional)
+flake8
+
+# Si usas logging enriquecido
+colorlog
+
+# Documentación (opcional)
+markdown
