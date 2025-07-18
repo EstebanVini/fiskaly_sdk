@@ -34,18 +34,22 @@ class SignersAPI:
         """
         self.client = client
 
-    def create(self, signer_id: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> SignerModel:
+    def create(
+        self,
+        signer_id: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        certificate: Optional[dict] = None
+    ) -> SignerModel:
         """
-        Crea un nuevo signer.
-
-        :param signer_id: GUID único del signer (si None, se genera automáticamente).
-        :param metadata: Metadata opcional.
-        :return: SignerModel con datos del signer creado.
-        :raises FiskalyApiError: Si la API responde con error.
+        Crea un nuevo signer. Si se pasa certificate, se incluye en el body.
         """
         signer_id = signer_id or generate_guid()
-        body = SignerRequest(metadata=metadata or {})
-        resp = self.client.request("PUT", f"/signers/{signer_id}", json=body.dict())
+        body = {"metadata": metadata or {}}
+
+        # Solo incluye el campo "content" si se pasa certificate
+        if certificate is not None:
+            body["content"] = {"certificate": certificate}
+        resp = self.client.request("PUT", f"/signers/{signer_id}", json=body)
         return SignerModel.model_validate(resp)
 
     def disable(self, signer_id: str, metadata: Optional[Dict[str, Any]] = None) -> SignerModel:
