@@ -48,7 +48,7 @@ class ExportsAPI:
         export_id = export_id or generate_guid()
         body = ExportRequest(content=content or {}, metadata=metadata or {})
         resp = self.client.request("PUT", f"/exports/{export_id}", json=body.dict())
-        return ExportResponse.parse_obj(resp)
+        return ExportResponse.model_validate(resp)
 
     def get(self, export_id: str) -> ExportResponse:
         """
@@ -58,7 +58,7 @@ class ExportsAPI:
         :return: ExportResponse con los datos de la exportación.
         """
         resp = self.client.request("GET", f"/exports/{export_id}")
-        return ExportResponse.parse_obj(resp)
+        return ExportResponse.model_validate(resp)
 
     def list(self, params: Optional[Dict[str, Any]] = None) -> List[ExportResponse]:
         """
@@ -68,7 +68,7 @@ class ExportsAPI:
         :return: Lista de ExportResponse.
         """
         resp = self.client.request("GET", "/exports", params=params or {})
-        list_response = ExportsListResponse.parse_obj(resp)
+        list_response = ExportsListResponse.model_validate(resp)
         return [ExportResponse(content=item) for item in list_response.content]
 
     def download_zip(self, export_id: str) -> bytes:
@@ -92,4 +92,4 @@ class ExportsAPI:
         """
         body = ExportUpdateRequest(content=content, metadata=metadata or {})
         resp = self.client.request("PATCH", f"/exports/{export_id}", json=body.dict())
-        return ExportResponse.parse_obj(resp)
+        return ExportResponse.model_validate(resp)

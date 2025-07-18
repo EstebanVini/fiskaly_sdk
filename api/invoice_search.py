@@ -15,5 +15,5 @@ class InvoiceSearchAPI:
         Busca facturas en toda la organización usando filtros globales.
         """
         resp = self.client.request("GET", "/invoices", params=params or {})
-        list_response = InvoicesListResponse.parse_obj(resp)
-        return [InvoiceResponse(content=item) for item in list_response.content]
+        list_response = InvoicesListResponse.model_validate(resp)
+        return [InvoiceResponse.model_validate({"content": item}) for item in list_response.content]

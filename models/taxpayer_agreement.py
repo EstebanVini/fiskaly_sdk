@@ -1,15 +1,25 @@
-# fiskaly_sdk/models/taxpayer_agreement.py
-
-from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field
 
+# Puedes modelar Address en detalle según el OpenAPI, aquí un placeholder:
+class AddressModel(BaseModel):
+    street: str
+    city: str
+    postal_code: str
+    country: str
+
+class RepresentativeModel(BaseModel):
+    full_name: str
+    tax_number: str
+    address: AddressModel
+
+class TaxpayerAgreementGenerateRequestContent(BaseModel):
+    representative: RepresentativeModel
+
 class TaxpayerAgreementGenerateRequest(BaseModel):
-    content: Dict[str, Any] = Field(default_factory=dict)
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    content: TaxpayerAgreementGenerateRequestContent
 
 class TaxpayerAgreementUploadRequest(BaseModel):
-    content: Dict[str, Any]
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    content: dict
 
 class TaxpayerAgreementResponseContent(BaseModel):
     agreement_id: str = Field(..., description="ID del acuerdo")
@@ -17,4 +27,3 @@ class TaxpayerAgreementResponseContent(BaseModel):
 
 class TaxpayerAgreementResponse(BaseModel):
     content: TaxpayerAgreementResponseContent
-    metadata: Optional[Dict[str, Any]] = None

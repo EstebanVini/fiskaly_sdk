@@ -4,46 +4,49 @@
 Modelos de datos para el recurso Signers en el SDK Fiskaly SIGN ES.
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field
 
+# -------- Certificado --------
+class CertificateModel(BaseModel):
+    expires_at: str = Field(..., description="Fecha de expiración del certificado")
+    serial_number: str = Field(..., description="Número de serie del certificado")
+    x509_pem: str = Field(..., description="Certificado X509 PEM")
+
+# -------- Signer --------
+class SignerContentModel(BaseModel):
+    certificate: CertificateModel = Field(..., description="Datos del certificado")
+    id: str = Field(..., description="ID del signer")
+    state: str = Field(..., description="Estado del signer (ENABLED, DISABLED)")
+
+class SignerModel(BaseModel):
+    content: SignerContentModel
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
+
+# -------- Request: Crear/Actualizar --------
 class SignerRequestContent(BaseModel):
-    """
-    Modelo para el contenido requerido al crear/actualizar un signer.
-    """
-    # El API permite un body vacío o solo metadata, pero puede crecer en el futuro.
+    # Si el API acepta body vacío o solo metadata, puedes dejarlo así.
     pass
 
 class SignerRequest(BaseModel):
-    """
-    Modelo completo para requests de creación/actualización de signer.
-    """
+    content: Optional[Dict[str, Any]] = Field(default_factory=dict)
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 class SignerStateRequest(BaseModel):
-    """
-    Modelo para deshabilitar (PATCH) un signer.
-    """
     content: Dict[str, str] = Field(..., description="Estado a establecer, p.ej: {'state': 'DISABLED'}")
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
-class SignerResponseContent(BaseModel):
-    """
-    Contenido de la respuesta al obtener datos de un signer.
-    """
-    id: str = Field(..., description="ID del signer")
-    state: Optional[str]
-    # Puedes agregar otros campos según la respuesta completa de la API.
-
+# -------- Response: Uno solo --------
 class SignerResponse(BaseModel):
-    """
-    Modelo completo de response para signer.
-    """
-    content: SignerResponseContent
+    content: SignerContentModel
     metadata: Optional[Dict[str, Any]] = None
 
+# -------- Response: Lista + paginación --------
+class PaginationModel(BaseModel):
+    limit: int = Field(..., description="Límite de resultados")
+    next: Optional[str] = Field(None, description="URL del siguiente page")
+    token: Optional[str] = Field(None, description="Token de paginación")
+
 class SignersListResponse(BaseModel):
-    """
-    Modelo para listar todos los signers.
-    """
-    content: list[SignerResponseContent]
+    pagination: PaginationModel
+    results: List[SignerModel]

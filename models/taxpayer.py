@@ -1,10 +1,7 @@
-# fiskaly_sdk/models/taxpayer.py
-
 """
 Modelos de datos para el recurso Taxpayer (contribuyente/emisor) en el SDK Fiskaly SIGN ES.
 """
 
-from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 class IssuerModel(BaseModel):
@@ -26,13 +23,12 @@ class TaxpayerRequest(BaseModel):
     Modelo completo de request para set taxpayer.
     """
     content: TaxpayerRequestContent
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 class TaxpayerStateRequest(BaseModel):
     """
     Modelo de request para deshabilitar taxpayer.
     """
-    content: Dict[str, str] = Field(..., description="Estado a establecer, p.ej: {'state': 'DISABLED'}")
+    content: dict = Field(..., description="Estado a establecer, p.ej: {'state': 'DISABLED'}")
 
 class TaxpayerResponseContent(BaseModel):
     """
@@ -40,11 +36,10 @@ class TaxpayerResponseContent(BaseModel):
     """
     issuer: IssuerModel
     territory: str
-    state: Optional[str] = None
+    state: str
 
 class TaxpayerResponse(BaseModel):
     """
     Modelo completo de response para taxpayer.
     """
     content: TaxpayerResponseContent
-    metadata: Optional[Dict[str, Any]] = None

@@ -1,12 +1,8 @@
-# fiskaly_sdk/api/taxpayer_agreement.py
-
-from typing import Dict, Any, Optional
 from ..models.taxpayer_agreement import (
     TaxpayerAgreementGenerateRequest,
     TaxpayerAgreementUploadRequest,
     TaxpayerAgreementResponse,
 )
-from ..exceptions import FiskalyApiError
 
 class TaxpayerAgreementAPI:
     """
@@ -15,28 +11,28 @@ class TaxpayerAgreementAPI:
     def __init__(self, client):
         self.client = client
 
-    def generate(self, content: Optional[Dict[str, Any]] = None, metadata: Optional[Dict[str, Any]] = None) -> TaxpayerAgreementResponse:
+    def generate(self, content) -> TaxpayerAgreementResponse:
         """
         Genera el borrador del acuerdo.
         """
-        body = TaxpayerAgreementGenerateRequest(content=content or {}, metadata=metadata or {})
+        body = TaxpayerAgreementGenerateRequest(content=content)
         resp = self.client.request("POST", "/taxpayer/agreement", json=body.dict())
-        return TaxpayerAgreementResponse.parse_obj(resp)
+        return TaxpayerAgreementResponse.model_validate(resp)
 
-    def upload(self, content: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None) -> TaxpayerAgreementResponse:
+    def upload(self, content) -> TaxpayerAgreementResponse:
         """
         Sube el acuerdo firmado.
         """
-        body = TaxpayerAgreementUploadRequest(content=content, metadata=metadata or {})
+        body = TaxpayerAgreementUploadRequest(content=content)
         resp = self.client.request("PUT", "/taxpayer/agreement", json=body.dict())
-        return TaxpayerAgreementResponse.parse_obj(resp)
+        return TaxpayerAgreementResponse.model_validate(resp)
 
     def get(self) -> TaxpayerAgreementResponse:
         """
         Obtiene la información del acuerdo del taxpayer.
         """
         resp = self.client.request("GET", "/taxpayer/agreement")
-        return TaxpayerAgreementResponse.parse_obj(resp)
+        return TaxpayerAgreementResponse.model_validate(resp)
 
     def download_pdf(self) -> bytes:
         """

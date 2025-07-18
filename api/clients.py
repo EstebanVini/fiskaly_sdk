@@ -45,7 +45,7 @@ class ClientsAPI:
         client_id = client_id or generate_guid()
         body = ClientRequest(metadata=metadata or {})
         resp = self.client.request("PUT", f"/clients/{client_id}", json=body.dict())
-        return ClientResponse.parse_obj(resp)
+        return ClientResponse.model_validate(resp)
 
     def disable(self, client_id: str, metadata: Optional[Dict[str, Any]] = None) -> ClientResponse:
         """
@@ -61,7 +61,7 @@ class ClientsAPI:
             metadata=metadata or {}
         )
         resp = self.client.request("PATCH", f"/clients/{client_id}", json=body.dict())
-        return ClientResponse.parse_obj(resp)
+        return ClientResponse.model_validate(resp)
 
     def get(self, client_id: str) -> ClientResponse:
         """
@@ -72,15 +72,19 @@ class ClientsAPI:
         :raises FiskalyApiError: Si la API responde con error.
         """
         resp = self.client.request("GET", f"/clients/{client_id}")
-        return ClientResponse.parse_obj(resp)
+        return ClientResponse.model_validate(resp)
 
-    def list(self) -> List[ClientResponse]:
+    def list(self, limit: int = 10, token: Optional[str] = None) -> ClientsListResponse:
         """
-        Lista todos los clients de la organización.
+        Lista todos los clients de la organización, soportando paginación.
 
-        :return: Lista de ClientResponse para cada client.
+        :param limit: Límite de elementos por página.
+        :param token: Token de paginación (si aplica).
+        :return: ClientsListResponse con la lista paginada de clientes.
         :raises FiskalyApiError: Si la API responde con error.
         """
-        resp = self.client.request("GET", "/clients")
-        list_response = ClientsListResponse.parse_obj(resp)
-        return [ClientResponse(content=item) for item in list_response.content]
+        params = {"limit": limit}
+        if token:
+            params["token"] = token
+        resp = self.client.request("GET", "/clients", params=params)
+        return ClientsListResponse.model_validate(resp)

@@ -1,10 +1,8 @@
-# fiskaly_sdk/models/client.py
-
 """
 Modelos de datos para el recurso Clients en el SDK Fiskaly SIGN ES.
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field
 
 class ClientRequestContent(BaseModel):
@@ -27,23 +25,38 @@ class ClientStateRequest(BaseModel):
     content: Dict[str, str] = Field(..., description="Estado a establecer, p.ej: {'state': 'DISABLED'}")
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
+class ClientSignerModel(BaseModel):
+    """
+    Modelo para el signer anidado dentro de un client.
+    """
+    id: str = Field(..., description="ID del signer asociado a este client")
+
 class ClientResponseContent(BaseModel):
     """
     Contenido de la respuesta al obtener datos de un client.
     """
     id: str = Field(..., description="ID único del client (device_id)")
+    signer: ClientSignerModel
     state: Optional[str] = None
-    # Puedes agregar otros campos según el API devuelva más datos
 
 class ClientResponse(BaseModel):
     """
     Modelo completo de response para client.
     """
     content: ClientResponseContent
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
+
+class ClientsPaginationModel(BaseModel):
+    """
+    Modelo para la paginación de la respuesta de listado de clients.
+    """
+    limit: int
+    next: Optional[str] = None
+    token: Optional[str] = None
 
 class ClientsListResponse(BaseModel):
     """
     Modelo para la respuesta de listado de clients.
     """
-    content: list[ClientResponseContent]
+    pagination: ClientsPaginationModel
+    results: List[ClientResponse]

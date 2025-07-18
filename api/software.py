@@ -14,4 +14,4 @@ class SoftwareAPI:
         Recupera la información del software registrado.
         """
         resp = self.client.request("GET", "/software")
-        return SoftwareResponse.parse_obj(resp)
+        return SoftwareResponse.model_validate(resp)
