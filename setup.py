@@ -7,7 +7,7 @@ readme_path = "README.md" if os.path.exists("README.md") else "docs/README.md"
 setup(
     name='fiskaly-sdk-sign-es',
     version='0.1.0',
-    description='SDK oficial para la integración con la API Fiskaly SIGN ES',
+    description='SDK NO oficial para la integración con la API Fiskaly SIGN ES',
     author='Esteban Viniegra Pérez Olagaray',
     author_email='esteban@eviniegra.software',
     url='https://github.com/EstebanVini/fiskaly_sdk.git',
