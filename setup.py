@@ -10,7 +10,7 @@ setup(
     description='SDK oficial para la integración con la API Fiskaly SIGN ES',
     author='Esteban Viniegra Pérez Olagaray',
     author_email='esteban@eviniegra.software',
-    url='https://github.com/tuusuario/fiskaly-sdk-sign-es',
+    url='https://github.com/EstebanVini/fiskaly_sdk.git',
     packages=find_packages(),
     install_requires=[
         'requests>=2.25.1',
