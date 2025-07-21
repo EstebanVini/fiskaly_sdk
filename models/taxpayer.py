@@ -23,6 +23,7 @@ class TaxpayerRequest(BaseModel):
     Modelo completo de request para set taxpayer.
     """
     content: TaxpayerRequestContent
+    metadata: dict | None = Field(default=None, description="Metadatos adicionales para el taxpayer")
 
 class TaxpayerStateRequest(BaseModel):
     """

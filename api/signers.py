@@ -1,5 +1,3 @@
-# fiskaly_sdk/api/signers.py
-
 """
 API para gestionar firmantes (signers) en el SDK Fiskaly SIGN ES.
 """
@@ -7,11 +5,9 @@ API para gestionar firmantes (signers) en el SDK Fiskaly SIGN ES.
 from typing import Optional, Dict, Any
 from ..exceptions import FiskalyApiError
 from ..models.signer import (
-    SignerRequest,
     SignerStateRequest,
-    SignerResponse,
-    SignersListResponse,
-    SignerModel
+    SignerModel,
+    SignersListResponse
 )
 from ..utils import generate_guid
 
@@ -20,7 +16,7 @@ class SignersAPI:
     API para gestionar los dispositivos firmantes (signers).
 
     Métodos:
-      - create(signer_id, metadata)
+      - create(signer_id, metadata, certificate_b64, private_key_b64, private_key_password)
       - disable(signer_id, metadata)
       - get(signer_id)
       - list()
@@ -38,17 +34,33 @@ class SignersAPI:
         self,
         signer_id: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        certificate: Optional[dict] = None
+        certificate_b64: Optional[str] = None,
+        private_key_b64: Optional[str] = None,
+        private_key_password: Optional[str] = None,
     ) -> SignerModel:
         """
-        Crea un nuevo signer. Si se pasa certificate, se incluye en el body.
+        Crea un nuevo signer. Si se pasan certificado y clave, se suben a la API.
+
+        :param signer_id: ID único del signer (opcional).
+        :param metadata: Metadata adicional (opcional).
+        :param certificate_b64: Certificado X509 en base64 (opcional).
+        :param private_key_b64: Clave privada en base64 (opcional, obligatorio si se pasa certificate).
+        :param private_key_password: Password de la clave privada (opcional).
+        :return: SignerModel
+        :raises FiskalyApiError: Si la API responde con error.
         """
         signer_id = signer_id or generate_guid()
         body = {"metadata": metadata or {}}
 
-        # Solo incluye el campo "content" si se pasa certificate
-        if certificate is not None:
-            body["content"] = {"certificate": certificate}
+        if certificate_b64 and private_key_b64:
+            content = {
+                "certificate": certificate_b64,
+                "private_key": private_key_b64,
+            }
+            if private_key_password:
+                content["private_key_password"] = private_key_password
+            body["content"] = content
+
         resp = self.client.request("PUT", f"/signers/{signer_id}", json=body)
         return SignerModel.model_validate(resp)
 

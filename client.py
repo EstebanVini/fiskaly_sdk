@@ -35,13 +35,12 @@ class FiskalyClient:
         api_secret: str,
         base_url: str = "https://sign-api.fiskaly.com/api/v1",
         timeout: int = 30,
-        verify_ssl: bool = True
     ):
         self.config = FiskalyConfig(
             api_key=api_key,
             api_secret=api_secret,
             base_url=base_url,
-            timeout=timeout
+            timeout=timeout,
         )
         self.session = requests.Session()
         self._bearer_token: Optional[str] = None
@@ -57,7 +56,6 @@ class FiskalyClient:
         self.invoice_xml = InvoiceXMLAPI(self)
         self.invoice_search = InvoiceSearchAPI(self)
         self.software = SoftwareAPI(self)
-        self.verify_ssl = verify_ssl
 
     def authenticate(self) -> str:
         """
@@ -99,7 +97,6 @@ class FiskalyClient:
                 url=url,
                 headers=headers,
                 timeout=self.config.timeout,
-                verify=self.verify_ssl,
                 **kwargs
             )
         except requests.RequestException as e:
