@@ -23,6 +23,7 @@ from .api.taxpayer_agreement import TaxpayerAgreementAPI
 from .api.invoice_xml import InvoiceXMLAPI
 from .api.invoice_search import InvoiceSearchAPI
 from .api.software import SoftwareAPI
+from .api.organizations import OrganizationsAPI 
 
 class FiskalyClient:
     """
@@ -70,6 +71,8 @@ class FiskalyClient:
         self.invoice_xml = InvoiceXMLAPI(self)
         self.invoice_search = InvoiceSearchAPI(self)
         self.software = SoftwareAPI(self)
+        self.organizations = OrganizationsAPI(self)
+
 
     def authenticate(self) -> str:
         """
