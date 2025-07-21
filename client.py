@@ -13,6 +13,7 @@ from .exceptions import (
     FiskalyAuthError,
 )
 from .api.auth import AuthAPI
+from .api.management_auth import ManagementAuthAPI
 from .api.taxpayer import TaxpayerAPI
 from .api.signers import SignersAPI
 from .api.clients import ClientsAPI
@@ -35,18 +36,31 @@ class FiskalyClient:
         api_secret: str,
         base_url: str = "https://sign-api.fiskaly.com/api/v1",
         timeout: int = 30,
+        management_api_key: Optional[str] = None,  # <-- Added parameter
+        management_api_secret: Optional[str] = None,
+        organization_id: Optional[str] = None,  # <-- Added parameter
     ):
         self.config = FiskalyConfig(
             api_key=api_key,
             api_secret=api_secret,
             base_url=base_url,
             timeout=timeout,
+            organization_id=organization_id,
+            management_api_key=management_api_key,
+            management_api_secret=management_api_secret
         )
         self.session = requests.Session()
         self._bearer_token: Optional[str] = None
+        #self._organization_id: Optional[str] = organization_id  # <-- Store organization_id
+        self.management_bearer_token: Optional[str] = None
+
+        # Set organization_id if provided
+        if organization_id:
+            self.config.organization_id = organization_id
 
         # Inicializa los recursos principales del API
         self.auth = AuthAPI(self)
+        self.management_auth = ManagementAuthAPI(self)
         self.taxpayer = TaxpayerAPI(self)
         self.signers = SignersAPI(self)
         self.clients = ClientsAPI(self)
@@ -64,6 +78,15 @@ class FiskalyClient:
         token = self.auth.retrieve_access_token()
         self._bearer_token = token
         return token
+    
+    def management_authenticate(self) -> str:
+        """
+        Realiza la autenticación administrativa y obtiene un token Bearer.
+        """
+        management_token, organization_id = self.management_auth.retrieve_management_access_token()
+        self._bearer_token = management_token
+        self.config.organization_id = organization_id
+        return management_token , organization_id
 
     @property
     def headers(self) -> Dict[str, str]:
@@ -72,7 +95,7 @@ class FiskalyClient:
         """
         if not self._bearer_token:
             raise FiskalyAuthError("El token Bearer no está presente. Llama a authenticate() primero.")
-        return {
+        headers = {
             "Authorization": f"Bearer {self._bearer_token}",
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -115,9 +138,32 @@ class FiskalyClient:
         else:
             return resp.content
 
-
     def set_bearer_token(self, token: str):
         self._bearer_token = token
 
     def get_bearer_token(self) -> Optional[str]:
         return self._bearer_token
+    
+    def set_management_bearer_token(self, token: str):
+        """
+        Guarda el token Bearer para autenticación administrativa.
+        """
+        self.management_bearer_token = token
+
+    def get_management_bearer_token(self) -> Optional[str]:
+        """
+        Obtiene el token Bearer para autenticación administrativa.
+        """
+        return self.management_bearer_token
+
+    def set_organization_id(self, organization_id: str):
+        """
+        Guarda el ID de la organización en el cliente.
+        """
+        self.config.organization_id = organization_id
+
+    def get_organization_id(self) -> Optional[str]:
+        """
+        Obtiene el ID de la organización configurado en el cliente.
+        """
+        return self.config.organization_id
