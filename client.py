@@ -24,6 +24,7 @@ from .api.invoice_xml import InvoiceXMLAPI
 from .api.invoice_search import InvoiceSearchAPI
 from .api.software import SoftwareAPI
 from .api.organizations import OrganizationsAPI 
+from .api.api_keys import ApiKeysAPI  
 
 class FiskalyClient:
     """
@@ -72,6 +73,7 @@ class FiskalyClient:
         self.invoice_search = InvoiceSearchAPI(self)
         self.software = SoftwareAPI(self)
         self.organizations = OrganizationsAPI(self)
+        self.api_keys = ApiKeysAPI(self)
 
 
     def authenticate(self) -> str:
@@ -170,3 +172,7 @@ class FiskalyClient:
         Obtiene el ID de la organización configurado en el cliente.
         """
         return self.config.organization_id
+
+    def set_api_key_and_secret(self, api_key: str, api_secret: str):
+        self.api_key = api_key
+        self.api_secret = api_secret

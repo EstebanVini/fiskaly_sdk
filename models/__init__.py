@@ -22,3 +22,6 @@ from .invoice import *
 from .export import *
 from .taxpayer_agreement import *
 from .software import *
+from .organization import *
+from .management_auth import *
+from .api_key import *

@@ -28,3 +28,4 @@ from .invoice_search import InvoiceSearchAPI
 from .software import SoftwareAPI
 from .management_auth import ManagementAuthAPI  # Importa el nuevo módulo de autenticación administrativa   
 from .organizations import OrganizationsAPI  # Importa el nuevo módulo de organizaciones
+from .api_keys import ApiKeysAPI  # Importa el nuevo módulo de claves API
